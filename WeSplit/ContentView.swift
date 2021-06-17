@@ -8,46 +8,52 @@
 import SwiftUI
 
 struct ContentView: View {
-    let bears = ["Baby Bear", "Momma Bear", "Pappa Bear"]
-    let bearEmojis = ["🧸", "🐻‍❄️" , "🐻" ]
-    @State private var selectedBear = 0
+    @State private var checkAmount = ""
+    @State private var numberOfPeople = 2
+    @State private var tipPerentage = 2
     
-    var body: some View {
-        Picker("Select your student", selection: $selectedBear) {
-            ForEach(0 ..< bears.count) {
-                Text(self.bears[$0])
-            }
-        }
-        Text("You selected \(bearEmojis[selectedBear])").font(.title)
+    let tipPercentages = [10, 15, 20, 25, 0]
+    
+    var totalPerPerson: Double {
+        let tip = Double(tipPercentages[tipPerentage])
+        let people = Double(numberOfPeople + 2)
+        let total = Double(checkAmount) ?? 0
+        
+        let tipAmount = total * tip / 100
+        let finalTotal = total + tipAmount
+        let perPersonTotal = finalTotal / people
+        
+        return perPersonTotal
     }
     
-//    @State private var name = ""
-//
-//    var body: some View {
-//        Form {
-//            TextField("Enter your name", text: $name)
-//            Text("Your name is \(name)")
-//        }
-//    }
-    
-//    @State private var tapCount = 0
-//
-//    var body: some View {
-//        Button("Tap Count \(tapCount)") {
-//            self.tapCount += 1
-//        }
-//    }
-//    var body: some View {
-//        NavigationView {
-//            Form {
-//                Section {
-//                    Text("Hello, world!")
-//                    //            .padding()
-//                }
-//            }
-//            .navigationBarTitle("SwiftUI")
-//        }
-//    }
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    TextField("Amount", text: $checkAmount)
+                        .keyboardType(.decimalPad)
+                    
+                    Picker("Number of people", selection: $numberOfPeople) {
+                        ForEach(2 ..< 100) {
+                            Text("\($0) people")
+                        }
+                    }
+                }
+                Section(header: Text("How much tip do you want to leave?")) {
+                    Picker("Tip percentage", selection: $tipPerentage) {
+                        ForEach(0 ..< tipPercentages.count) {
+                            Text("\(tipPercentages[$0])%")
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                Section {
+                    Text("$\(totalPerPerson, specifier: "%.2f")")
+                }
+            }
+            .navigationBarTitle("WeSplit")
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
